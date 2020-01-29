@@ -1,6 +1,7 @@
 package net.crimsonwoods.cloudfirestorechat.domain.repository.firestore
 
 import com.google.firebase.firestore.FirebaseFirestore
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import net.crimsonwoods.cloudfirestorechat.domain.*
@@ -10,11 +11,6 @@ import javax.inject.Inject
 class FirestoreChatRoomRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : ChatRoomRepository {
-    override fun get(id: ChatRoomId): Single<ChatRoom> {
-        // TODO implement
-        return Single.just(ChatRoom(id, listOf(), listOf()))
-    }
-
     override fun updates(id: ChatRoomId): Observable<ChatRoom> {
         // TODO implement
         return Observable.just(ChatRoom(id, listOf(
@@ -25,5 +21,9 @@ class FirestoreChatRoomRepository @Inject constructor(
             Message.OtherMessage(UserId("U0002"), "B", 1L),
             Message.SelfMessage(UserId("U0001"), "テスト", 2L)
         )))
+    }
+
+    override fun postMessage(id: ChatRoomId, message: Message): Completable {
+        return Completable.complete()
     }
 }
