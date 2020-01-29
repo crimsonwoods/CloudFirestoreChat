@@ -9,17 +9,28 @@ import net.crimsonwoods.cloudfirestorechat.R
 import net.crimsonwoods.cloudfirestorechat.domain.ChatRoomId
 import net.crimsonwoods.cloudfirestorechat.domain.GroupId
 import net.crimsonwoods.cloudfirestorechat.domain.Message
-import net.crimsonwoods.cloudfirestorechat.domain.UserId
 import net.crimsonwoods.cloudfirestorechat.domain.repository.ChatRoomRepository
+import net.crimsonwoods.cloudfirestorechat.domain.repository.FriendUserIdRepository
+import net.crimsonwoods.cloudfirestorechat.domain.repository.MyUserIdRepository
 import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
-    internal val chatRoomId: ChatRoomId = CHAT_ROOM_ID
+    internal val chatRoomId: ChatRoomId by lazy {
+        ChatRoomId.from(
+            MY_GROUP_ID,
+            myUserIdRepository.get(),
+            friendUserIdRepository.get()
+        )
+    }
 
     @Inject
-    lateinit var messagesAdapter: MessagesAdapter
-    @Inject
     lateinit var chatRoomRepository: ChatRoomRepository
+    @Inject
+    lateinit var myUserIdRepository: MyUserIdRepository
+    @Inject
+    lateinit var friendUserIdRepository: FriendUserIdRepository
+    @Inject
+    lateinit var messagesAdapter: MessagesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,18 +47,16 @@ class MainActivity : DaggerAppCompatActivity() {
             isEnabled = false
 
             setOnClickListener {
-            if (!submit.isEnabled) return@setOnClickListener
+                if (!submit.isEnabled) return@setOnClickListener
 
-            submit.isEnabled = false
+                submit.isEnabled = false
 
-                chatRoomRepository.postMessage(
-                    chatRoomId,
-                    Message.SelfMessage(
-                        MY_USER_ID,
-                        edit_message.text.toString(),
-                        System.currentTimeMillis()
-                    )
+                val message = Message.SelfMessage(
+                    myUserIdRepository.get(),
+                    edit_message.text.toString(),
+                    System.currentTimeMillis()
                 )
+                chatRoomRepository.postMessage(chatRoomId, message)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         edit_message.text = null
@@ -61,9 +70,6 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     companion object {
-        private val MY_USER_ID = UserId("U0001")
-        private val MY_FRIEND_ID = UserId("U0002")
         private val MY_GROUP_ID = GroupId("G001")
-        private val CHAT_ROOM_ID = ChatRoomId.from(MY_GROUP_ID, MY_USER_ID, MY_FRIEND_ID)
     }
 }

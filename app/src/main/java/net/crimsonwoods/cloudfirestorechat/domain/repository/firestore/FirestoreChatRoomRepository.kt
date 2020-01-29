@@ -10,12 +10,16 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import net.crimsonwoods.cloudfirestorechat.domain.*
 import net.crimsonwoods.cloudfirestorechat.domain.repository.ChatRoomRepository
+import net.crimsonwoods.cloudfirestorechat.domain.repository.MyUserIdRepository
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class FirestoreChatRoomRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val myUserIdRepository: MyUserIdRepository
 ) : ChatRoomRepository {
+    private val myUserId by lazy { myUserIdRepository.get() }
+
     override fun updates(id: ChatRoomId): Observable<ChatRoom> {
         return Observable.create { emitter ->
             firestore.document("rooms/$id")
@@ -46,7 +50,7 @@ class FirestoreChatRoomRepository @Inject constructor(
                                 val userId = UserId(message["user_id"] as String)
                                 val messageText = message["message"] as String
                                 val timeStamp = message["time_stamp"] as Long
-                                if (userId == UserId("U0001")) {
+                                if (userId == myUserId) {
                                     Message.SelfMessage(userId, messageText, timeStamp)
                                 } else {
                                     Message.OtherMessage(userId, messageText, timeStamp)

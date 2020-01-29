@@ -25,10 +25,12 @@ class MessagesAdapter @Inject constructor(
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        return when(viewType) {
+        return when (viewType) {
             VIEW_TYPE_SELF -> MessageViewHolder.SelfMessageViewHolder(parent)
             VIEW_TYPE_OTHER -> MessageViewHolder.OtherMessageViewHolder(parent)
-            else -> { throw NotImplementedError() }
+            else -> {
+                throw NotImplementedError()
+            }
         }
     }
 
@@ -37,23 +39,27 @@ class MessagesAdapter @Inject constructor(
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
 
-        when(holder) {
+        when (holder) {
             is MessageViewHolder.SelfMessageViewHolder -> {
                 check(message is Message.SelfMessage)
 
-                userRepository.get(message.ownerUserId).subscribe { user: User ->
-                    holder.userIcon.setUserIcon(user.icon)
-                    holder.userName.text = user.name
-                }
+                userRepository.get(message.ownerUserId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { user: User ->
+                        holder.userIcon.setUserIcon(user.icon)
+                        holder.userName.text = user.name
+                    }
                 holder.userMessage.text = message.message
             }
             is MessageViewHolder.OtherMessageViewHolder -> {
                 check(message is Message.OtherMessage)
 
-                userRepository.get(message.ownerUserId).subscribe { user: User ->
-                    holder.userIcon.setUserIcon(user.icon)
-                    holder.userName.text = user.name
-                }
+                userRepository.get(message.ownerUserId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { user: User ->
+                        holder.userIcon.setUserIcon(user.icon)
+                        holder.userName.text = user.name
+                    }
                 holder.userMessage.text = message.message
             }
         }
@@ -76,7 +82,7 @@ class MessagesAdapter @Inject constructor(
     }
 
     private fun ImageView.setUserIcon(icon: UserIcon) {
-        when(icon) {
+        when (icon) {
             is UserIcon.Loadable -> {
                 // TODO load image from URI
                 setImageResource(icon.resId)
