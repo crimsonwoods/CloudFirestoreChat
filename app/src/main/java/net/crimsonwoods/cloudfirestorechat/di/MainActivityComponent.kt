@@ -2,10 +2,14 @@ package net.crimsonwoods.cloudfirestorechat.di
 
 import dagger.BindsInstance
 import dagger.Subcomponent
+import dagger.android.AndroidInjectionModule
 import dagger.android.AndroidInjector
 import net.crimsonwoods.cloudfirestorechat.ui.MainActivity
 
-@Subcomponent
+@Subcomponent(modules = [
+    AndroidInjectionModule::class,
+    MainActivityModule::class
+])
 interface MainActivityComponent: AndroidInjector<MainActivity> {
     val activity: MainActivity
 
