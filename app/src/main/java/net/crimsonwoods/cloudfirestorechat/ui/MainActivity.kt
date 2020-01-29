@@ -7,20 +7,20 @@ import net.crimsonwoods.cloudfirestorechat.R
 import net.crimsonwoods.cloudfirestorechat.domain.ChatRoomId
 import net.crimsonwoods.cloudfirestorechat.domain.GroupId
 import net.crimsonwoods.cloudfirestorechat.domain.UserId
-import net.crimsonwoods.cloudfirestorechat.domain.repository.ChatRoomRepository
 import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
+    internal val chatRoomId: ChatRoomId = CHAT_ROOM_ID
+
     @Inject
-    lateinit var chatRoomRepository: ChatRoomRepository
+    lateinit var messagesAdapter: MessagesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        chatRoomRepository.updates(CHATROOM_ID).subscribe {
-            // TODO update messages
-        }.autoDisposeOnDestroy(lifecycle)
+        messagesAdapter.autoDisposeOnDestroy(lifecycle)
+        messages.adapter = messagesAdapter
 
         submit.setOnClickListener {
             if (!submit.isEnabled) return@setOnClickListener
@@ -38,6 +38,6 @@ class MainActivity : DaggerAppCompatActivity() {
         private val MY_USER_ID = UserId("U0001")
         private val MY_FRIEND_ID = UserId("U0002")
         private val MY_GROUP_ID = GroupId("G001")
-        private val CHATROOM_ID = ChatRoomId.from(MY_GROUP_ID, MY_USER_ID, MY_FRIEND_ID)
+        private val CHAT_ROOM_ID = ChatRoomId.from(MY_GROUP_ID, MY_USER_ID, MY_FRIEND_ID)
     }
 }
