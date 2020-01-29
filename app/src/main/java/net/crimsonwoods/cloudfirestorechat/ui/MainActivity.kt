@@ -2,6 +2,7 @@ package net.crimsonwoods.cloudfirestorechat.ui
 
 import android.os.Bundle
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 import net.crimsonwoods.cloudfirestorechat.R
 import net.crimsonwoods.cloudfirestorechat.domain.ChatRoomId
 import net.crimsonwoods.cloudfirestorechat.domain.GroupId
@@ -20,6 +21,17 @@ class MainActivity : DaggerAppCompatActivity() {
         chatRoomRepository.updates(CHATROOM_ID).subscribe {
             // TODO update messages
         }.autoDisposeOnDestroy(lifecycle)
+
+        submit.setOnClickListener {
+            if (!submit.isEnabled) return@setOnClickListener
+
+            submit.isEnabled = false
+            submit.postDelayed({ submit.isEnabled = true }, 300L)
+
+            // TODO submit message
+
+            edit_message.text = null
+        }
     }
 
     companion object {
