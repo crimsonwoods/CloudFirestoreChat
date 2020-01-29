@@ -2,11 +2,14 @@ package net.crimsonwoods.cloudfirestorechat.ui
 
 import android.os.Bundle
 import dagger.android.support.DaggerAppCompatActivity
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import net.crimsonwoods.cloudfirestorechat.R
 import net.crimsonwoods.cloudfirestorechat.domain.ChatRoomId
 import net.crimsonwoods.cloudfirestorechat.domain.GroupId
+import net.crimsonwoods.cloudfirestorechat.domain.Message
 import net.crimsonwoods.cloudfirestorechat.domain.UserId
+import net.crimsonwoods.cloudfirestorechat.domain.repository.ChatRoomRepository
 import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
@@ -14,6 +17,8 @@ class MainActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var messagesAdapter: MessagesAdapter
+    @Inject
+    lateinit var chatRoomRepository: ChatRoomRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,11 +31,13 @@ class MainActivity : DaggerAppCompatActivity() {
             if (!submit.isEnabled) return@setOnClickListener
 
             submit.isEnabled = false
-            submit.postDelayed({ submit.isEnabled = true }, 300L)
 
-            // TODO submit message
-
-            edit_message.text = null
+            chatRoomRepository.postMessage(chatRoomId, Message.SelfMessage(MY_USER_ID, edit_message.text.toString(), System.currentTimeMillis()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    edit_message.text = null
+                    submit.isEnabled = true
+                }
         }
     }
 
