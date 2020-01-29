@@ -23,9 +23,9 @@ data class ChatRoomId(private val rawValue: String) : CharSequence by rawValue {
          */
         fun from(groupId: GroupId, ownUserId: UserId, friendUserId: UserId): ChatRoomId {
             return if (ownUserId > friendUserId) {
-                ChatRoomId("$groupId$friendUserId$ownUserId")
+                ChatRoomId("$groupId-$friendUserId-$ownUserId")
             } else {
-                ChatRoomId("$groupId$ownUserId$friendUserId")
+                ChatRoomId("$groupId-$ownUserId-$friendUserId")
             }
         }
     }
