@@ -1,18 +1,19 @@
 package net.crimsonwoods.cloudfirestorechat.ui
 
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import net.crimsonwoods.cloudfirestorechat.domain.ChatRoomId
-import net.crimsonwoods.cloudfirestorechat.domain.Message
-import net.crimsonwoods.cloudfirestorechat.domain.isSelf
+import net.crimsonwoods.cloudfirestorechat.domain.*
 import net.crimsonwoods.cloudfirestorechat.domain.repository.ChatRoomRepository
+import net.crimsonwoods.cloudfirestorechat.domain.repository.UserRepository
 import javax.inject.Inject
 
 class MessagesAdapter @Inject constructor(
     chatRoomId: ChatRoomId,
-    chatRoomRepository: ChatRoomRepository
+    chatRoomRepository: ChatRoomRepository,
+    private val userRepository: UserRepository
 ) : RecyclerView.Adapter<MessageViewHolder>(), Disposable {
     private var messages: List<Message> = listOf()
     private val disposable: Disposable = chatRoomRepository
@@ -25,8 +26,8 @@ class MessagesAdapter @Inject constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when(viewType) {
-            VIEWTYPE_SELF -> MessageViewHolder.SelfMessageViewHolder(parent.context)
-            VIEWTYPE_OTHER -> MessageViewHolder.OtherMessageViewHolder(parent.context)
+            VIEWTYPE_SELF -> MessageViewHolder.SelfMessageViewHolder(parent)
+            VIEWTYPE_OTHER -> MessageViewHolder.OtherMessageViewHolder(parent)
             else -> { throw NotImplementedError() }
         }
     }
@@ -34,7 +35,28 @@ class MessagesAdapter @Inject constructor(
     override fun getItemCount(): Int = messages.size
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        // TODO implement
+        val message = messages[position]
+
+        when(holder) {
+            is MessageViewHolder.SelfMessageViewHolder -> {
+                check(message is Message.SelfMessage)
+
+                userRepository.get(message.ownerUserId).subscribe { user: User ->
+                    holder.userIcon.setUserIcon(user.icon)
+                    holder.userName.text = user.name
+                }
+                holder.userMessage.text = message.message
+            }
+            is MessageViewHolder.OtherMessageViewHolder -> {
+                check(message is Message.OtherMessage)
+
+                userRepository.get(message.ownerUserId).subscribe { user: User ->
+                    holder.userIcon.setUserIcon(user.icon)
+                    holder.userName.text = user.name
+                }
+                holder.userMessage.text = message.message
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -51,6 +73,18 @@ class MessagesAdapter @Inject constructor(
 
     override fun isDisposed(): Boolean {
         return disposable.isDisposed
+    }
+
+    private fun ImageView.setUserIcon(icon: UserIcon) {
+        when(icon) {
+            is UserIcon.Loadable -> {
+                // TODO load image from URI
+                setImageResource(icon.resId)
+            }
+            is UserIcon.None -> {
+                setImageResource(icon.resId)
+            }
+        }
     }
 
     companion object {
