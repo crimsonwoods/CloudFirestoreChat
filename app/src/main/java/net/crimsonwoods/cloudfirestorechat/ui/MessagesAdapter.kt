@@ -26,8 +26,8 @@ class MessagesAdapter @Inject constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when(viewType) {
-            VIEWTYPE_SELF -> MessageViewHolder.SelfMessageViewHolder(parent)
-            VIEWTYPE_OTHER -> MessageViewHolder.OtherMessageViewHolder(parent)
+            VIEW_TYPE_SELF -> MessageViewHolder.SelfMessageViewHolder(parent)
+            VIEW_TYPE_OTHER -> MessageViewHolder.OtherMessageViewHolder(parent)
             else -> { throw NotImplementedError() }
         }
     }
@@ -61,9 +61,9 @@ class MessagesAdapter @Inject constructor(
 
     override fun getItemViewType(position: Int): Int {
         return if (messages[position].isSelf) {
-            VIEWTYPE_SELF
+            VIEW_TYPE_SELF
         } else {
-            VIEWTYPE_OTHER
+            VIEW_TYPE_OTHER
         }
     }
 
@@ -88,7 +88,7 @@ class MessagesAdapter @Inject constructor(
     }
 
     companion object {
-        private const val VIEWTYPE_SELF: Int = 0
-        private const val VIEWTYPE_OTHER: Int = 1
+        private const val VIEW_TYPE_SELF: Int = 0
+        private const val VIEW_TYPE_OTHER: Int = 1
     }
 }
