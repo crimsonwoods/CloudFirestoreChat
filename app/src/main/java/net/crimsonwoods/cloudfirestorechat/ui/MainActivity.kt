@@ -1,7 +1,8 @@
-package net.crimsonwoods.cloudfirestorechat
+package net.crimsonwoods.cloudfirestorechat.ui
 
 import android.os.Bundle
 import dagger.android.support.DaggerAppCompatActivity
+import net.crimsonwoods.cloudfirestorechat.R
 
 class MainActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
