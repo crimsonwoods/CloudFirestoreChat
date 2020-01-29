@@ -24,4 +24,19 @@ sealed class UserIcon {
     object None : UserIcon() {
         override val resId: Int = android.R.drawable.sym_def_app_icon
     }
+
+    companion object {
+        fun from(uri: String?): UserIcon {
+            return when (uri) {
+                null -> None
+                else -> {
+                    val parsed = Uri.parse(uri)
+                    when(parsed.scheme) {
+                        "http", "https" -> Loadable(parsed)
+                        else -> None
+                    }
+                }
+            }
+        }
+    }
 }
