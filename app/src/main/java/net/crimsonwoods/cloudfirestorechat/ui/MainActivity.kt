@@ -2,6 +2,7 @@ package net.crimsonwoods.cloudfirestorechat.ui
 
 import android.os.Bundle
 import androidx.core.widget.addTextChangedListener
+import androidx.recyclerview.widget.RecyclerView
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,6 +37,16 @@ class MainActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        messagesAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+
+                // Scrolling down to the bottom of messages automatically.
+                if (messagesAdapter.itemCount > 0) {
+                    messages.scrollToPosition(messagesAdapter.itemCount - 1)
+                }
+            }
+        })
         messagesAdapter.autoDisposeOnDestroy(lifecycle)
         messages.adapter = messagesAdapter
 
