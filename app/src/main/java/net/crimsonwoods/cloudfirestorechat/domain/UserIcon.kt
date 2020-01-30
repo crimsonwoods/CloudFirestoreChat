@@ -2,6 +2,7 @@ package net.crimsonwoods.cloudfirestorechat.domain
 
 import android.net.Uri
 import androidx.annotation.DrawableRes
+import net.crimsonwoods.cloudfirestorechat.R
 
 sealed class UserIcon {
     /**
@@ -15,14 +16,14 @@ sealed class UserIcon {
      * [Uri]で表現される動的な読み込みが可能なユーザーアイコン
      */
     data class Loadable(val uri: Uri): UserIcon() {
-        override val resId: Int = android.R.drawable.sym_def_app_icon
+        override val resId: Int = R.drawable.ic_face_24px_rounded
     }
 
     /**
      * ユーザーアイコンが未設定の場合に使われるデフォルトのユーザーアイコン
      */
     object None : UserIcon() {
-        override val resId: Int = android.R.drawable.sym_def_app_icon
+        override val resId: Int = R.drawable.ic_face_24px_rounded
     }
 
     companion object {
